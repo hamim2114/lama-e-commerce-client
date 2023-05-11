@@ -7,6 +7,10 @@ import Product from './pages/Product'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import axios from 'axios'
+import { BASE_URL } from './baseUrl'
+
+axios.defaults.baseURL = BASE_URL
 
 function App() {
   return (
