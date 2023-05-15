@@ -1,8 +1,13 @@
 import styled from "styled-components";
 import {mobile} from "../responsive";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { loginFail, loginStart, loginSuccess } from "../redux/userSlice";
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: linear-gradient(
       rgba(255, 255, 255, 0.5),
@@ -50,24 +55,44 @@ const Button = styled.button`
   margin-bottom: 10px;
 `;
 
-const Link = styled.a`
+const Links = styled.div`
   margin: 5px 0px;
   font-size: 12px;
-  text-decoration: underline;
   cursor: pointer;
 `;
 
 const Login = () => {
+  const [input, setInput] = useState({});
+  const {loading} = useSelector(state => state.user)
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+
+  const handleChange = (e) => {
+    e.preventDefault()
+    setInput({...input, [e.target.name]: e.target.value})
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      dispatch(loginStart())
+      const res = await axios.post('/auth/signin', {...input})
+      dispatch(loginSuccess(res.data))
+      navigate('/')
+    } catch (error) {
+      dispatch(loginFail())
+      console.log(error.response.data)
+    }
+  }
   return (
     <Container>
       <Wrapper>
         <Title>SIGN IN</Title>
         <Form>
-          <Input placeholder="username" />
-          <Input placeholder="password" />
-          <Button>LOGIN</Button>
-          <Link>DO NOT YOU REMEMBER THE PASSWORD?</Link>
-          <Link>CREATE A NEW ACCOUNT</Link>
+          <Input required onChange={handleChange} name="username" placeholder="username" />
+          <Input required type="password" onChange={handleChange} name="password" placeholder="password" />
+          <Button onClick={handleSubmit}>{loading ? 'LOADING..' : 'LOGIN'}</Button>
+          <Link style={{textDecoration: 'none', margin: '5px 0px', fontSize: '12px'}}>DO NOT YOU REMEMBER THE PASSWORD?</Link>
+          <Links><Link style={{textDecoration: 'none', margin: '5px 0px', fontSize: '12px'}} to='/register'>CREATE A NEW ACCOUNT</Link></Links>
         </Form>
       </Wrapper>
     </Container>

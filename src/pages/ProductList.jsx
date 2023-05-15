@@ -48,8 +48,8 @@ const ProductList = () => {
   }
   return (
     <Container>
-      <Navbar />
       <Announcement />
+      <Navbar />
       <Title>{category.toUpperCase()}</Title>
       <FilterContainer>
         <Filter>

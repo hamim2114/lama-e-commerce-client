@@ -5,11 +5,11 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Newsletter from "../components/Newsletter";
 import { mobile } from "../responsive";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../redux/cartSlice";
 
 const Container = styled.div``;
@@ -125,10 +125,12 @@ const Product = () => {
   const [product, setProduct] = useState({})
   const [quantity, setQuantity] = useState(1)
   const [color, setColor] = useState('')
-  const [size, setSize] = useState('')
+  const [size, setSize] = useState('M')
+  const {user} = useSelector(state => state.user)
   
-  const id = useParams().id
-  const dispatch = useDispatch()
+  const id = useParams().id;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
    const fetchProduct = async() => {
@@ -152,7 +154,11 @@ const Product = () => {
   };
 
   const handleAdd = () => {
-    dispatch(addProduct({...product, quantity, color, size }))
+    if (user) {
+      dispatch(addProduct({...product, quantity, color, size }))
+    } else{
+      navigate('/login')
+    }
   }
   return (
     <Container>

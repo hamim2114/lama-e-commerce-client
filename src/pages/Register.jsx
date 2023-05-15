@@ -1,8 +1,11 @@
 import styled from "styled-components";
 import { mobile } from "../responsive";
+import { useState } from "react";
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled.div`
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: linear-gradient(
       rgba(255, 255, 255, 0.5),
@@ -55,23 +58,45 @@ const Button = styled.button`
 `;
 
 const Register = () => {
+  const [input, setInput] = useState({});
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('')
+// console.log(input)
+  const navigate = useNavigate()
+  
+  const handleInput = (e) => {
+    setInput({...input, [e.target.name]: e.target.value})
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axios.post('/auth/signup', {...input})
+      setSuccessMsg(res.data);
+      setTimeout(() => {
+        navigate('/login')
+      }, 2000);
+    } catch (error) {
+      setErrorMsg(error.response.data.message)
+      console.log(error.response.data.message)
+    }
+  }
+
   return (
     <Container>
       <Wrapper>
         <Title>CREATE AN ACCOUNT</Title>
         <Form>
-          <Input placeholder="name" />
-          <Input placeholder="last name" />
-          <Input placeholder="username" />
-          <Input placeholder="email" />
-          <Input placeholder="password" />
-          <Input placeholder="confirm password" />
+          <Input required name="username" onChange={handleInput} placeholder="username" />
+          <Input required name="email" onChange={handleInput} placeholder="email" />
+          <Input required type="password" name="password" onChange={handleInput} placeholder="password" />
           <Agreement>
             By creating an account, I consent to the processing of my personal
             data in accordance with the <b>PRIVACY POLICY</b>
           </Agreement>
-          <Button>CREATE</Button>
+          <Button onClick={handleSubmit}>CREATE</Button>
         </Form>
+        {successMsg || errorMsg && <span style={{color: successMsg? 'green' : 'red'}}>{successMsg || errorMsg}</span>}
       </Wrapper>
     </Container>
   );
